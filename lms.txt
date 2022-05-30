@@ -1,0 +1,463 @@
+package lms2;
+
+/**
+ *
+ * @author Avihe Vitjitua
+ */
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Scanner;
+
+interface Library{
+    boolean verification();
+}
+
+/**
+ *
+ * @author Avihe Vitjitua
+ */
+public class LibraryManagementSystem {
+    public static List<String> books = new ArrayList<>();
+    public static List<Integer> quantity = new ArrayList<>();
+    public static List<String> authors = new ArrayList<>();
+    public static int booksIndex = 0;
+
+    public static final class Book{
+       
+        public Book(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Welcome to Books portal\n");
+            String ans = "";
+            String reuse = null;
+            boolean check = false;
+
+            do {
+                System.out.println("Enter the functionalities you want to use : ");
+                System.out.println("Press 1 for Book Display");
+                System.out.println("Press 2 for Adding book");
+                int option = sc.nextInt();
+                switch (option) {
+                    case 1 -> booksDisplay();
+                    case 2 -> addBook();
+                    default ->{
+                        System.out.println("Enter a valid input \n");
+                        check = true;
+                        continue;
+                    }
+                }
+               
+                System.out.println("Do you want to use the functions again ?");
+                reuse = sc.next();
+                check = reuse.toUpperCase(Locale.ROOT).equals("YES");
+
+            }while(check);
+
+            if(reuse.toUpperCase(Locale.ROOT).equals("NO")){
+                System.out.println("Thank you for using Book portal -:)");
+            }
+        }
+
+        public void booksDisplay(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Books available : ");
+            for(int i = 0 ; i < books.size();i++){
+                System.out.println("Book Name : "+books.get(i)+" Author : "+authors.get(i)+" Quantity : "+quantity.get(i));
+            }
+        }
+
+        public void addBook(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Enter book name : ");
+            String bookName = sc.next();
+            books.add(booksIndex,bookName);
+            sc.nextLine();
+            System.out.println("Enter book author : ");
+            String bookAuthor = sc.nextLine();
+            authors.add(booksIndex,bookAuthor);
+            System.out.println("Enter quantity :");
+            int quant = sc.nextInt();
+            quantity.add(booksIndex,quant);
+            booksIndex++;
+            System.out.println("Book added successfully -:) ");
+        }
+
+    }
+
+    public static final class Student extends Person{
+        String name ;
+        String password  = "STUDENT";
+        boolean repeat = false;
+//CODE TO GET STUDET DETAIL AND ACCESS STUDENT PORTAL
+        public Student(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Welcome to Student portal\n");
+            String ans = "";
+//CODE TO CHECK FOR AUTHENTIFICATION AND FUNCTIONALIES STUDENT WANT TO ACCESS  
+            do{
+                boolean checkStudent = verification();
+                if(checkStudent){
+                   
+                    boolean check = false;
+                    String reuse = null;
+                   
+                    do {
+                        System.out.println("Enter the functionalities you want to use : ");
+                        System.out.println("Press 1 for Book Issue");
+                        System.out.println("Press 2 for Book Return");
+                        int option = sc.nextInt();
+                        switch (option) {
+                            case 1 -> bookIssue();
+                            case 2 -> bookReturn();
+                            default -> {
+                                System.out.println("Enter a valid input \n");
+                                check = true;
+                                continue;
+                            }
+                        }
+                        System.out.println("Do you want to use the functions again ?");
+                        reuse = sc.next();
+                        check = reuse.toUpperCase(Locale.ROOT).equals("YES");
+
+                    }while(check);
+
+                    if(reuse.toUpperCase(Locale.ROOT).equals("NO")){
+                        System.out.println("Thank you for using student portal -:)");
+                    }
+
+                }else{
+                    System.out.println("Wrong password :-(");
+                    System.out.println("Do you want to try again .");
+                    ans = sc.next();
+                    this.repeat = ans.toUpperCase(Locale.ROOT).equals("YES");
+                    System.out.println("\n\n");
+                }
+            }while(this.repeat);
+
+            if(ans.toUpperCase(Locale.ROOT).equals("NO")){
+                System.out.println("Thank you for entering student portal -:)");
+            }
+        }
+
+        public boolean verification(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Please enter your name : ");
+            this.name = sc.next();
+            System.out.println("Enter student password : ");
+            String code = sc.next();
+            return code.equals(this.password);
+        }
+//CODE FOR WHICH BOOK A STUDENT OR MEMBER WISHES TO BORROW
+        public void bookIssue(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Enter book you want to issue : ");
+            String bookName = sc.next();
+            int count = -1;
+            for(int i = 0;i<books.size();i++){
+                if(bookName.equals(books.get(i))){
+                    count = i;
+                    break;
+                }
+            }
+
+            if(count==-1){
+                System.out.println("Book is not available ");
+            }else{
+                if(quantity.get(count)>0){
+                    System.out.println("Quantity available ");
+                    int data = quantity.get(count);
+                    data = data - 1;
+                   
+                    quantity.set(count,data);
+                    System.out.println("Book have been issued ");
+                }else{
+                    System.out.println("Quantity unavailable ");
+                }
+            }
+        }
+//CODE TO INDICATE WHICH BOOK WAS BORROWED TO BE RETURNED
+        public void bookReturn(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Enter book you want to return : ");
+            String bookName = sc.next();
+            int count = -1;
+            for(int i = 0;i<books.size();i++){
+                if(bookName.toUpperCase(Locale.ROOT).equals(books.get(i))){
+                    count = i;
+                    break;
+                }
+            }
+
+            if(count==-1){
+                System.out.println("Book is not available");
+            }else{
+                    int data = quantity.get(count);
+                    data += 1;
+                    quantity.set(count,data);
+            }
+        }
+    }
+      public static final class User extends Person{
+        String name ;
+        //default password which acn be changed at anytime
+        String password  = "RandomUser";
+        boolean repeat = false;
+//CODE TO GET USER DETAIL AND ACCESS  PORTAL
+        public User(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Welcome to portal\n");
+            String ans = "";
+//CODE TO CHECK FOR AUTHENTIFICATION AND FUNCTIONALIES THE USER WANTS TO ACCESS  
+            do{
+                boolean checkUser = verification();
+                if(checkUser){
+                   
+                    boolean check = false;
+                    String reuse = null;
+                   
+                    do {
+                        System.out.println("Enter the functionalities you want to use : ");
+                        System.out.println("Press 1 for Book Issue");
+                        System.out.println("Press 2 for Book Return");
+                        int option = sc.nextInt();
+                        switch (option) {
+                            case 1 -> bookIssue();
+                            case 2 -> bookReturn();
+                            default -> {
+                                System.out.println("Enter a valid input \n");
+                                check = true;
+                                continue;
+                            }
+                        }
+                        System.out.println("Do you want to use the functions again ?");
+                        reuse = sc.next();
+                        check = reuse.toUpperCase(Locale.ROOT).equals("YES");
+
+                    }while(check);
+
+                    if(reuse.toUpperCase(Locale.ROOT).equals("NO")){
+                        System.out.println("Thank you for using  portal -:)");
+                    }
+
+                }else{
+                    System.out.println("Wrong password :-(");
+                    System.out.println("Do you want to try again .");
+                    ans = sc.next();
+                    this.repeat = ans.toUpperCase(Locale.ROOT).equals("YES");
+                    System.out.println("\n\n");
+                }
+            }while(this.repeat);
+
+            if(ans.toUpperCase(Locale.ROOT).equals("NO")){
+                System.out.println("Thank you for entering  portal -:)");
+            }
+        }
+
+        public boolean verification(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Please enter your name : ");
+            this.name = sc.next();
+            System.out.println("Enter student password : ");
+            String code = sc.next();
+            return code.equals(this.password);
+        }
+//CODE FOR WHICH BOOK A USER OR MEMBER WISHES TO BORROW
+        public void bookIssue(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Enter book you want to issue : ");
+            String bookName = sc.next();
+            int count = -1;
+            for(int i = 0;i<books.size();i++){
+                if(bookName.equals(books.get(i))){
+                    count = i;
+                    break;
+                }
+            }
+
+            if(count==-1){
+                System.out.println("Book is not available ");
+            }else{
+                if(quantity.get(count)>0){
+                    System.out.println("Quantity available ");
+                    int data = quantity.get(count);
+                    data -= 1;
+                   
+                    quantity.set(count,data);
+                    System.out.println("Book have been issued ");
+                }else{
+                    System.out.println("Quantity unavailable ");
+                }
+            }
+        }
+//CODE TO INDICATE WHICH BOOK WAS BORROWED TO BE RETURNED
+        public void bookReturn(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Enter book you want to return : ");
+            String bookName = sc.next();
+            int count = -1;
+            for(int i = 0;i<books.size();i++){
+                if(bookName.toUpperCase(Locale.ROOT).equals(books.get(i))){
+                    count = i;
+                    break;
+                }
+            }
+
+            if(count==-1){
+                System.out.println("Book is not available");
+            }else{
+                    int data = quantity.get(count);
+                    data += 1;
+                    quantity.set(count,data);
+            }
+        }
+    }
+    
+
+    public static final class Librain extends Person{
+        String name ;
+        String password  = "STAFF";
+        boolean repeat = false;
+
+        public Librain(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Welcome to Staff Members portal\n");
+            String ans = "";
+
+            do{
+                boolean checkStaffMember = verification();
+                if(checkStaffMember){
+                    boolean check = false;
+                    String reuse = null;
+                    do {
+                        System.out.println("Enter the functionalities you want to use : ");
+                        System.out.println("Press 1 for Book Quantity");
+                        System.out.println("Press 2 for Book Add");
+                        int option = sc.nextInt();
+                        switch (option) {
+                            case 1 -> bookQuantity();
+                            case 2-> {
+                                Book b = new Book();
+                            }
+                            default ->{System.out.println("Enter  valid input ");
+                              check =  true;
+                              continue;
+                            }
+                        }
+                       
+                        System.out.println("Do you want to use the functions again ?");
+                        reuse = sc.next();
+                        check = reuse.toUpperCase(Locale.ROOT).equals("YES");
+
+                    }while(check);
+
+                    if(reuse.toUpperCase(Locale.ROOT).equals("NO")){
+                        System.out.println("Thank you for using staff member portal -:)");
+                    }
+
+                }else{
+                    System.out.println("Wrong password :-(");
+                    System.out.println("Do you want to try again .");
+                    ans = sc.next();
+                    this.repeat = ans.toUpperCase(Locale.ROOT).equals("YES");
+                    System.out.println("\n\n");
+                }
+            }while(this.repeat);
+
+            if(ans.toUpperCase(Locale.ROOT).equals("NO")){
+                System.out.println("Thank you for entering staff member portal -:)");
+            }
+        }
+        public boolean verification(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Please enter your name : ");
+            this.name = sc.next();
+            System.out.println("Enter Staff Member password : ");
+            String code = sc.next();
+            return code.equals(this.password);
+        }
+
+        public void bookQuantity(){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Enter book you want to check quantity of : ");
+            String bookName = sc.next();
+            int count = -1;
+            for(int i = 0;i<books.size();i++){
+                if(bookName.equals(books.get(i))){
+                    count = i;
+                    break;
+                }
+            }
+
+            if(count==-1){
+                System.out.println("Book is not available ");
+            }else{
+                if(quantity.get(count)>0){
+                    System.out.println("Quantity available ");
+                    System.out.println("BOOK NAME : "+bookName +" BOOK QUANTITY : "+quantity.get(count));
+                }
+            }
+        }
+    }
+
+   public static class Library{
+       
+        public Library(){
+            Scanner sc = new Scanner(System.in);
+            boolean repeat = false;
+            String ans = "";
+
+            System.out.println("Welcome to library : ");
+            do {
+                System.out.println("Who are you ?( Student / Staff /Public memeber)");
+                String person = sc.next();
+                switch (person) {
+                    case "STUDENT" -> {
+                        Student s1 = new Student();
+                        System.out.println("Do you want to enter again ? (Yes / No)");
+                        ans = sc.next();
+                        repeat = ans.toUpperCase(Locale.ROOT).equals("YES");
+                        break;
+                    }
+                     case "USER" -> {
+                        User s1 = new User();
+                        System.out.println("Do you want to enter again ? (Yes / No)");
+                        ans = sc.next();
+                        repeat = ans.toUpperCase(Locale.ROOT).equals("YES");
+                        break;
+                     }
+                    case "STAFF" -> {
+                        Librain s2 = new Librain();
+                        System.out.println("Do you want to enter again ? (Yes / No)");
+                        ans = sc.next();
+                        repeat = ans.toUpperCase(Locale.ROOT).equals("YES");
+                        break;
+                    }
+                    
+                    default -> {
+                        System.out.println("Wrong Input");
+                        System.out.println("Kindly enter again");
+                        repeat = true;
+                    }
+                }
+            }while(repeat);
+           
+            if(ans.toUpperCase(Locale.ROOT).equals("NO")){
+                System.out.println("Thank you for using the program :-)");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Library l1 = new Library();
+    }
+
+    public static class Person {
+
+        public Person() {
+            String fName;
+            String lname;
+            
+        }
+    }
+}
+
